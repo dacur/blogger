@@ -1,0 +1,17 @@
+language: ruby
+rvm:
+  - 2.4.2
+before_install:
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.7.0
+  - export PATH="$HOME/.yarn/bin:$PATH"
+  - yarn install
+cache: yarn
+before_script:
+  - cp config/.env.example config/.env
+  - psql -c 'create database blogger_test;' -U postgres
+  - bundle exec rake db:migrate --trace
+  - bundle exec rake db:test:prepare --trace
+script:
+  - bundle exec rubocop
+  - bundle exec rspec
+  - yarn lint
